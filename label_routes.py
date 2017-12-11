@@ -2,14 +2,21 @@
 import argparse
 import cv2
 import pickle
+from shapely.geometry import Point, LineString
+
+#TODO: label other thing other than routes! Use points on line string for bolts
+# and anchors or ther things.
+#TODO: multiple route labelling
 
 # initialize the list of reference points and boolean indicating
 # whether cropping is being performed or not
-routes = [[]]
+routes = []
+current_route = []
 
 def click_CB(event, x, y, flags, param):
     # grab references to the global variables
     global routes
+    global current_route
     # if the left mouse button was clicked, record the starting
     # (x, y) coordinates and indicate that cropping is being
     # performed
@@ -20,11 +27,11 @@ def click_CB(event, x, y, flags, param):
     # record the ending (x, y) coordinates and indicate that
     # the cropping operation is finished
         print("adding point")
-        routes[-1].append((x, y))
+        current_route.append((x, y))
 
     # draw the connecting line
-        if len(routes[-1]) > 1:
-            cv2.line(image, routes[-1][-2], routes[-1][-1], (0, 255, 0), 2)
+        if len(current_route) > 1:
+            cv2.line(image, current_route[-2], current_route[-1], (0, 255, 0), 2)
             cv2.imshow("image", image)
 
 
@@ -56,7 +63,10 @@ while True:
 
     # if the 'c' key is pressed, break from the loop
     elif key == ord("c"):
+        route = LineString(current_route)
+        routes.append(route)
         break
+        #TODO instead of closing, create another route.
 
 #write refernce points to a file
 with open('routes.pickle', 'wb') as f:
