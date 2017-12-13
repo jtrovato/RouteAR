@@ -61,10 +61,15 @@ while True:
     if key == ord("r"):
         image = clone.copy()
 
-    # if the 'c' key is pressed, break from the loop
-    elif key == ord("c"):
+    elif key == ord("n"):
         route = LineString(current_route)
         routes.append(route)
+        current_route = []
+    # if the 'c' key is pressed, break from the loop
+    elif key == ord("c"):
+        if current_route is not []:
+            route = LineString(current_route)
+            routes.append(route)
         break
         #TODO instead of closing, create another route.
 

@@ -11,7 +11,7 @@ MIN_MATCH_COUNT = 10;
 #load images and routes
 print("loading images")
 img1 = cv2.resize(cv2.imread('IMG_1541.JPG'), (0,0), fx=0.25, fy=0.25)
-img2 = cv2.resize(cv2.imread('IMG_1546.JPG'), (0,0), fx=0.25, fy=0.25)
+img2 = cv2.resize(cv2.imread('IMG_1547.JPG'), (0,0), fx=0.25, fy=0.25)
 print(img1.shape)
 gray1= cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY)
 gray2= cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
@@ -64,15 +64,22 @@ if len(good)>MIN_MATCH_COUNT:
     M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
     matchesMask = mask.ravel().tolist()
 
-    route_pts = np.float32(np.array([list(pt) for pt in routes[0].coords])).reshape(-1,1,2)
-    print(M)
-    new_route = cv2.perspectiveTransform(route_pts, M)
-
-    img2 = cv2.polylines(img2,[np.int32(new_route)],False,(0,255,0) ,3, cv2.LINE_AA)
+    for route in routes:
+        route_pts = np.float32(np.array([list(pt) for pt in route.coords])).reshape(-1,1,2)
+        new_route = cv2.perspectiveTransform(route_pts, M)
+        img2 = cv2.polylines(img2,[np.int32(new_route)],False,(0,255,0) ,3, cv2.LINE_AA)
 
 else:
     print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
     matchesMask = None
 
+#draw lines on original
+for route in routes:
+    img1 = cv2.polylines(img1, [np.int32(route)], False, (0,255,0), 3, cv2.LINE_AA)
 
-plt.imshow(img2),plt.show()
+
+plt.figure("train")
+plt.imshow(img1)
+plt.figure()
+plt.imshow(img2)
+plt.show()
